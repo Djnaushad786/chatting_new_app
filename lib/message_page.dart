@@ -1,13 +1,14 @@
+import 'package:chatting_new_app/services/device_token_service.dart';
+import 'package:chatting_new_app/services/notification_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import 'chat_view_model.dart';
 import 'home_page.dart';
 
-
 class MassagePage extends StatefulWidget {
   final String otherUid;
+
   const MassagePage({super.key, required this.otherUid});
 
   @override
@@ -15,32 +16,46 @@ class MassagePage extends StatefulWidget {
 }
 
 class _MassagePageState extends State<MassagePage> {
-  final uId=FirebaseAuth.instance.currentUser?.uid;
+  var firebaseinstance = FirebaseAuth.instance.currentUser!.displayName;
+  NotificationService notificationService = NotificationService();
+  final uId = FirebaseAuth.instance.currentUser?.uid;
   ScrollController controller = ScrollController();
+
   @override
   void initState() {
     super.initState();
-    var uid= FirebaseAuth.instance.currentUser?.uid ??"";
-    Future.delayed(Duration(seconds: 2),() async{
-      var viewModel = Provider.of<ChatViewModel>(context, listen: false);
-      var chatRoomId = await viewModel.getChatList(cid: uid, otherId: widget.otherUid);
-
-
-    },);
+    var uid = FirebaseAuth.instance.currentUser?.uid ?? "";
+    Future.delayed(
+      Duration(seconds: 2),
+      () async {
+        var viewModel = Provider.of<ChatViewModel>(context, listen: false);
+        var chatRoomId =
+            await viewModel.getChatList(cid: uid, otherId: widget.otherUid);
+      },
+    );
   }
+
   @override
   Widget build(BuildContext context) {
-    var viewModel = Provider.of<ChatViewModel>(context,listen: false);
+    var viewModel = Provider.of<ChatViewModel>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(onPressed: () {
-          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => ChatHomePage(uid: ""),));
-        }, icon: Icon(Icons.arrow_back)),
+        leading: IconButton(
+            onPressed: () {
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ChatHomePage(uid: ""),
+                  ));
+            },
+            icon: Icon(Icons.arrow_back)),
       ),
       body: Column(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height-210 - MediaQuery.of(context).viewInsets.bottom,
+            height: MediaQuery.of(context).size.height -
+                210 -
+                MediaQuery.of(context).viewInsets.bottom,
             child: Consumer<ChatViewModel>(
               builder: (context, value, child) {
                 if (value.chatList.isEmpty) {
@@ -56,23 +71,29 @@ class _MassagePageState extends State<MassagePage> {
                           padding: const EdgeInsets.all(8.0),
                           child: user.senderId == uId
                               ? Align(
-                              alignment: Alignment.topRight,
-                              child: Image.network("${user.photo_url}",  height: 100, width: 100,))
+                                  alignment: Alignment.topRight,
+                                  child: Image.network(
+                                    "${user.photo_url}",
+                                    height: 100,
+                                    width: 100,
+                                  ))
                               : Align(
-                              alignment: Alignment.topLeft,
-                              child: Image.network("${user.photo_url}", height: 100, width: 100,))
-                      );
-
-                    }else {
+                                  alignment: Alignment.topLeft,
+                                  child: Image.network(
+                                    "${user.photo_url}",
+                                    height: 100,
+                                    width: 100,
+                                  )));
+                    } else {
                       return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: user.senderId == uId
                               ? Align(
-                              alignment: Alignment.topRight,
-                              child: Text("${user.message}"))
+                                  alignment: Alignment.topRight,
+                                  child: Text("${user.message}"))
                               : Align(
-                              alignment: Alignment.topLeft,
-                              child: Text("${user.message}")));
+                                  alignment: Alignment.topLeft,
+                                  child: Text("${user.message}")));
                     }
                   },
                 );
@@ -83,25 +104,50 @@ class _MassagePageState extends State<MassagePage> {
             height: 110,
             child: Row(
               children: [
-                Expanded(child: TextField(
+                Expanded(
+                    child: TextField(
                   controller: viewModel.chatController,
-                  decoration: InputDecoration(hintText: "massage",border: OutlineInputBorder(borderRadius: BorderRadius.circular(20))),
+                  decoration: InputDecoration(
+                      hintText: "massage",
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(20))),
                 )),
-                IconButton(onPressed: () {
-                  viewModel.sendChat(otherUid: widget.otherUid);
-                  Future.delayed(Duration(milliseconds: 300),() {
-                    controller.jumpTo(controller.position.maxScrollExtent);
-
-                  },);
-                }, icon: Icon(Icons.send))
+                IconButton(
+                    onPressed: () {
+                      sendNotificationToUser(
+                          senderName: firebaseinstance.toString(),
+                          message: viewModel.chatController.text,
+                          otherUid: viewModel.otherUId);
+                      viewModel.sendChat(otherUid: widget.otherUid);
+                      Future.delayed(
+                        Duration(milliseconds: 300),
+                        () {
+                          controller
+                              .jumpTo(controller.position.maxScrollExtent);
+                        },
+                      );
+                    },
+                    icon: Icon(Icons.send))
               ],
             ),
           )
         ],
       ),
-
     );
   }
+
+  void sendNotificationToUser(
+      {required String senderName,
+      required String message,
+      required String otherUid}) async {
+    var deviceTokenGetData = DeviceTokenService();
+    String? deviceToken =
+        await deviceTokenGetData.getDeviceTokenFromFirebase(otherUid);
+    if (deviceToken != null && message.isNotEmpty) {
+      await notificationService.sendOrderNotification(
+          message: message,
+          token: deviceToken,
+          senderName: firebaseinstance.toString());
+    }
+  }
 }
-
-

@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:app_settings/app_settings.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
@@ -53,15 +52,17 @@ class NotificationService{
           "universe_domain": "googleapis.com"
         }
         ),scopes
+
     );
     final serverKey=client.credentials.accessToken.data;
     print("serverKey=$serverKey");
     return serverKey;
     }
+
     Future<void>getDeviceToken()async{
       String? token=await messaging.getToken();
       if(token!=null){
-        print(" Device Token $token");
+        print("Device Token $token");
       }
     }
 
@@ -90,7 +91,7 @@ class NotificationService{
     );
   }
 
-  void sendOrderNotification({required String message,required String token,required String senderName })async{
+  Future<void> sendOrderNotification({required String message,required String token,required String senderName })async{
     print('token id :$token');
     final serverKey=await getServerKey();
     try{
