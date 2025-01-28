@@ -1,7 +1,9 @@
+
 import 'dart:core';
 import 'package:chatting_new_app/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
@@ -13,6 +15,7 @@ class UserProvider with ChangeNotifier{
 
   final  auth = FirebaseAuth.instance;
   bool isLoding = true;
+  FirebaseMessaging firebaseMessaging = FirebaseMessaging.instance;
 
   var nameController= TextEditingController();
   var emailController= TextEditingController();
@@ -21,12 +24,12 @@ class UserProvider with ChangeNotifier{
   List<UserModel> _userData= [];
   List<UserModel> get userData=> _userData;
 
-  // SignUp code//
 
   void userSignUp(BuildContext context) async{
     var name =  nameController.text.toString();
     var email = emailController.text.toString();
     var password= passwordController.text.toString();
+    var token = await getDeviceTokenFromFirebase();
 
     if(name.isNotEmpty && email.isNotEmpty && password.isNotEmpty){
 
@@ -64,7 +67,7 @@ class UserProvider with ChangeNotifier{
     }
   }
 
-  // userLogin//
+
   void userLogin(BuildContext context) async{
     var email= emailController.text;
     var password= passwordController.text;
@@ -86,14 +89,12 @@ class UserProvider with ChangeNotifier{
     }
   }
 
-  // logout user//
   void logoutUser(BuildContext context) async{
     await auth.signOut();
     Fluttertoast.showToast(msg: "logOut User");
     Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => LoginPage(),));
   }
 
-//user view code//
 
   Future<void> fetchUserData(String uid) async {
     DatabaseReference ref = FirebaseDatabase.instance.ref("user");
@@ -115,6 +116,17 @@ class UserProvider with ChangeNotifier{
       isLoding = false;
       notifyListeners();
     }
+  }
+
+  Future<String?>getDeviceTokenFromFirebase()async{
+    String? token = await firebaseMessaging.getToken();
+    if(token != null ){
+      print("device token $token");
     }
+    else{
+      print("something went wrong");
+    }
+    return token;
+  }
 
 }

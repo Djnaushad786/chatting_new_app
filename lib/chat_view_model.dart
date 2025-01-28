@@ -1,4 +1,6 @@
 import 'dart:math';
+import 'package:chatting_new_app/services/device_token_service.dart';
+import 'package:chatting_new_app/services/notification_service.dart';
 import 'package:chatting_new_app/user_model.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -13,6 +15,8 @@ class ChatViewModel with ChangeNotifier {
   var chatList = <ChatModel>[];
   var userList = <UserModel>[];
   var uid = FirebaseAuth.instance.currentUser?.uid ?? "";
+  NotificationService notificationService=NotificationService();
+  DeviceTokenService deviceTokenService=DeviceTokenService();
   String otherUId = "";
 
   getChatList({required String cid, required String otherId}) {
@@ -40,10 +44,12 @@ class ChatViewModel with ChangeNotifier {
     var cid = uid.toString();
     var chatId = getChatId(otherId: otherUid,cid: cid);
     var randomId = generateRandomString(40);
+    var token=deviceTokenService.getDeviceTokenFromFirebase(otherUid);
     DatabaseReference starCountRef = FirebaseDatabase.instance.ref('messages/$chatId');
 
     //sent, seen, unseen
     await starCountRef.child(randomId).set(ChatModel(message: chatController.text.toString(), senderId: "$uid",receiverId:  otherUid, status: "sent").toJson());
+    notificationService.sendOrderNotification(message: chatController.text, token: token.toString(), senderName: FirebaseAuth.instance.currentUser!.displayName.toString());
     chatController.clear();
     notifyListeners();
 
@@ -88,5 +94,5 @@ class ChatViewModel with ChangeNotifier {
       }
     });
     return id;
-    }
+  }
 }

@@ -13,10 +13,10 @@ class NotificationService{
 
   Future<void> requestNotificationPermission()async{
     NotificationSettings settings=await messaging.requestPermission(
-      alert: true,
-      badge: true,
-      provisional: true,
-      sound: true
+        alert: true,
+        badge: true,
+        provisional: true,
+        sound: true
     );
     if(settings.authorizationStatus==AuthorizationStatus.authorized){
       print('user granted permission');
@@ -57,14 +57,14 @@ class NotificationService{
     final serverKey=client.credentials.accessToken.data;
     print("serverKey=$serverKey");
     return serverKey;
-    }
+  }
 
-    Future<void>getDeviceToken()async{
-      String? token=await messaging.getToken();
-      if(token!=null){
-        print("Device Token $token");
-      }
+  Future<void>getDeviceToken()async{
+    String? token=await messaging.getToken();
+    if(token!=null){
+      print("Device Token $token");
     }
+  }
 
   Future<void>initApp()async{
     AndroidInitializationSettings androidInitializationSettings=AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -120,6 +120,6 @@ class NotificationService{
       print('error sending notification: $ex');
       Fluttertoast.showToast(msg: 'error sending notification');
     }
-    }
+  }
 
 }

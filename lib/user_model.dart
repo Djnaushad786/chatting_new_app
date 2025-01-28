@@ -10,6 +10,7 @@ class UserModel {
   String? name;
   String? email;
 
+
   UserModel({
     this.id,
     this.name,
@@ -25,8 +26,8 @@ class UserModel {
   );
 
   Map<String, dynamic> toJson() => {
-  "id": id,
-  "name": name,
-  "email":email,
+    "id": id,
+    "name": name,
+    "email":email,
   };
 }

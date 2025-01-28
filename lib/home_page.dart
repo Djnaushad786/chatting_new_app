@@ -27,9 +27,6 @@ class _ChatHomePageState extends State<ChatHomePage> {
     });
     FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
         alert: true, badge: true, sound: true);
-    // getUserData();
-    // 1. This method call when app in terminated state and you get a notification
-    // when you click on notification app open from terminated state and you can get notification data in this method
     FirebaseMessaging.instance.getInitialMessage().then(
           (message) {
         print("FirebaseMessaging.instance.getInitialMessage");
@@ -66,59 +63,54 @@ class _ChatHomePageState extends State<ChatHomePage> {
         }
       },
     );
-    // Future.microtask(() {
-    //   Provider.of<UserViewModel>(context, listen: false).fetchUserData(widget.uid);
-    //   NotificationService notificationService=NotificationService();
-    //   notificationService.requestPermission();
-    //   // notificationService.getDeviceToken();
-    //   notificationService.generateSecretKey();
-    // });
-    }
+
+
+  }
   @override
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.blue,
-          title: const Text("Chat Home"),
-          actions: [
-            IconButton(
-              onPressed: () {
-                Provider.of<UserProvider>(context, listen: false).logoutUser(context);
-              },
-              icon: const Icon(Icons.logout),
-            )
-          ],
-        ),
-        body: Consumer<UserProvider>(
-          builder: (context, userProvider, child) {
-            if (userProvider.isLoding) {
-              return Center(child: CircularProgressIndicator());
-            } else if (userProvider.userData.isEmpty) {
-              return Center(child: Text("No users found"));
-            } else {
-              return ListView.builder(
-                itemCount: userProvider.userData.length,
-                itemBuilder: (context, index) {
-                  var user = userProvider.userData[index];
-                  return InkWell(
-                    onTap: () {
-                      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MassagePage(otherUid: user.id.toString()),));
-                    },
-                    child: Card(
-                      margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                      child: ListTile(
-                        leading:  CircleAvatar(child: Icon(Icons.person),),
-                        title: Text("${user.name}"),
-                        subtitle: Text("${user.email}"),
-                      ),
+      appBar: AppBar(
+        backgroundColor: Colors.blue,
+        title: const Text("Chat Home"),
+        actions: [
+          IconButton(
+            onPressed: () {
+              Provider.of<UserProvider>(context, listen: false).logoutUser(context);
+            },
+            icon: const Icon(Icons.logout),
+          )
+        ],
+      ),
+      body: Consumer<UserProvider>(
+        builder: (context, userProvider, child) {
+          if (userProvider.isLoding) {
+            return Center(child: CircularProgressIndicator());
+          } else if (userProvider.userData.isEmpty) {
+            return Center(child: Text("No users found"));
+          } else {
+            return ListView.builder(
+              itemCount: userProvider.userData.length,
+              itemBuilder: (context, index) {
+                var user = userProvider.userData[index];
+                return InkWell(
+                  onTap: () {
+                    Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>MassagePage(otherUid: user.id.toString()),));
+                  },
+                  child: Card(
+                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                    child: ListTile(
+                      leading:  CircleAvatar(child: Icon(Icons.person),),
+                      title: Text("${user.name}"),
+                      subtitle: Text("${user.email}"),
                     ),
-                  );
-                },
-              );
-            }
-          },
-        ),
-        );
-    }
+                  ),
+                );
+              },
+            );
+          }
+        },
+      ),
+    );
+  }
 }

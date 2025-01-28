@@ -27,10 +27,10 @@ class _MassagePageState extends State<MassagePage> {
     var uid = FirebaseAuth.instance.currentUser?.uid ?? "";
     Future.delayed(
       Duration(seconds: 2),
-      () async {
+          () async {
         var viewModel = Provider.of<ChatViewModel>(context, listen: false);
         var chatRoomId =
-            await viewModel.getChatList(cid: uid, otherId: widget.otherUid);
+        await viewModel.getChatList(cid: uid, otherId: widget.otherUid);
       },
     );
   }
@@ -71,29 +71,29 @@ class _MassagePageState extends State<MassagePage> {
                           padding: const EdgeInsets.all(8.0),
                           child: user.senderId == uId
                               ? Align(
-                                  alignment: Alignment.topRight,
-                                  child: Image.network(
-                                    "${user.photo_url}",
-                                    height: 100,
-                                    width: 100,
-                                  ))
+                              alignment: Alignment.topRight,
+                              child: Image.network(
+                                "${user.photo_url}",
+                                height: 100,
+                                width: 100,
+                              ))
                               : Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Image.network(
-                                    "${user.photo_url}",
-                                    height: 100,
-                                    width: 100,
-                                  )));
+                              alignment: Alignment.topLeft,
+                              child: Image.network(
+                                "${user.photo_url}",
+                                height: 100,
+                                width: 100,
+                              )));
                     } else {
                       return Padding(
                           padding: const EdgeInsets.all(8.0),
                           child: user.senderId == uId
                               ? Align(
-                                  alignment: Alignment.topRight,
-                                  child: Text("${user.message}"))
+                              alignment: Alignment.topRight,
+                              child: Text("${user.message}"))
                               : Align(
-                                  alignment: Alignment.topLeft,
-                                  child: Text("${user.message}")));
+                              alignment: Alignment.topLeft,
+                              child: Text("${user.message}")));
                     }
                   },
                 );
@@ -106,12 +106,12 @@ class _MassagePageState extends State<MassagePage> {
               children: [
                 Expanded(
                     child: TextField(
-                  controller: viewModel.chatController,
-                  decoration: InputDecoration(
-                      hintText: "massage",
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(20))),
-                )),
+                      controller: viewModel.chatController,
+                      decoration: InputDecoration(
+                          hintText: "massage",
+                          border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20))),
+                    )),
                 IconButton(
                     onPressed: () {
                       sendNotificationToUser(
@@ -121,7 +121,7 @@ class _MassagePageState extends State<MassagePage> {
                       viewModel.sendChat(otherUid: widget.otherUid);
                       Future.delayed(
                         Duration(milliseconds: 300),
-                        () {
+                            () {
                           controller
                               .jumpTo(controller.position.maxScrollExtent);
                         },
@@ -136,13 +136,10 @@ class _MassagePageState extends State<MassagePage> {
     );
   }
 
-  void sendNotificationToUser(
-      {required String senderName,
-      required String message,
-      required String otherUid}) async {
+  void sendNotificationToUser({required String senderName, required String message,required String otherUid}) async {
     var deviceTokenGetData = DeviceTokenService();
     String? deviceToken =
-        await deviceTokenGetData.getDeviceTokenFromFirebase(otherUid);
+    await deviceTokenGetData.getDeviceTokenFromFirebase(otherUid);
     if (deviceToken != null && message.isNotEmpty) {
       await notificationService.sendOrderNotification(
           message: message,

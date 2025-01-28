@@ -32,5 +32,5 @@ class DeviceTokenService{
       return data['token'];
     }
     return null;
-    }
+  }
 }

@@ -1,3 +1,4 @@
+
 import 'package:chatting_new_app/services/notification_service.dart';
 import 'package:chatting_new_app/signup_page.dart';
 import 'package:chatting_new_app/user_provider.dart';
@@ -20,8 +21,8 @@ void main()async {
   },);
   FirebaseMessaging.instance.setForegroundNotificationPresentationOptions(
       alert: true, badge: true, sound: true);
-    var notificationService = NotificationService();
-    notificationService.initApp();
+  var notificationService = NotificationService();
+  notificationService.initApp();
 
   runApp(MultiProvider(providers: [
     ChangeNotifierProvider(create: (context) => UserProvider(),),
@@ -34,8 +35,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return  MaterialApp(
-        debugShowCheckedModeBanner: false,
-        home:SignupPage(), );
-    }
+      debugShowCheckedModeBanner: false,
+      home:SignupPage(), );
+  }
 
 }
